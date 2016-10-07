@@ -1,6 +1,6 @@
 <?php
 
-namespace Arek\Php\View;
+namespace Humble\View;
 
 use Psr\Http\Message\ResponseInterface;
 
