@@ -3,8 +3,9 @@
 namespace Humble\View;
 
 use Psr\Http\Message\ResponseInterface;
+use RuntimeException;
 
-class View
+class View implements ViewInterface
 {
     private $settings = [
         'templatePath' => '',
@@ -20,33 +21,33 @@ class View
         $this->container = $container;
     }
 
-    public function setTemplatePath(string $templatePath): self
+    public function setTemplatePath(string $templatePath): ViewInterface
     {
         $settings['templatePath'] = $templatePath;
 
         return $this;
     }
 
-    public function setLayout(string $layout): self
+    public function setLayout(string $layout): ViewInterface
     {
         $settings['layout'] = $layout;
 
         return $this;
     }
 
-    public function register(string $name, $extension): self
+    public function registerExtension(string $name, callable $extension): ViewInterface
     {
         $this->extensions[$name] = $extension;
 
         return $this;
     }
 
-    public function get(string $name)
+    public function getExtension(string $name)
     {
         return $this->extensions[$name] ?? null;
     }
 
-    public function call(string $name, ...$arguments)
+    public function callExtension(string $name, ...$arguments)
     {
         if (isset($this->extensions[$name]) && is_callable($this->extensions[$name])) {
             return $this->extensions[$name](...$arguments);
@@ -80,7 +81,7 @@ class View
     public function partial(string $template, array $arguments = array()): string
     {
         if (!is_file($this->settings['templatePath'] . $template)) {
-            throw new \RuntimeException("The template `$template` could not be found.");
+            throw new RuntimeException("The template `$template` could not be found.");
         }
 
         extract($arguments);
